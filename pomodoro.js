@@ -38,7 +38,7 @@ function pomodoroTimer() {
     document.getElementById("start-stop").textContent = "Pause";
     isPomodoroRunning = true;
     totalTime = (storedTime > 0) ? storedTime
-                  : (isLongTimer) ? 60 * 25 : 5;
+                  : (isLongTimer) ? 60 * 25 : 60 * 5;
     timer = setInterval(() => {
       totalTime--;
       const min = parseInt(totalTime / 60);
