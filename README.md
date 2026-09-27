@@ -1,1 +1,1 @@
-![Banner](./assets/BannerPomodoroTimer.png)
+![Banner](./assets/NewBannerPomodoroTimer.png)
