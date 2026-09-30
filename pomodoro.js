@@ -19,10 +19,12 @@ function timerSwitch() {
 function setTimer() {
     if (storedTime > 0) {
         document.getElementById("start-stop").textContent = "Resume";
+        document.getElementById("title").textContent = `Pomodoro Timer`;
     } 
     else {
         document.getElementById("start-stop").textContent = "Start";
         document.getElementById("timer").textContent = isLongTimer ? "25:00" : "5:00";
+        document.getElementById("title").textContent = `Pomodoro Timer`;
     }
 }
 
@@ -44,14 +46,15 @@ function pomodoroTimer() {
       const min = parseInt(totalTime / 60);
       const sec = parseInt(totalTime % 60);
       const secFormatado = String(sec).padStart(2, "0");
-      document.getElementById("timer").textContent =
-        `${min}:${secFormatado}`;
+      document.getElementById("timer").textContent = `${min}:${secFormatado}`;
+      document.getElementById("title").textContent = `${min}:${secFormatado}`;
       console.log(`${min}:${sec}`);
       storedTime = totalTime;
       if (totalTime == 0) {
         stopTimer();
         timerSwitch();
         alarme.play();
+        document.getElementById("title").textContent = `Pomodoro Timer`;
       }
     }, 1000);
   } else {
