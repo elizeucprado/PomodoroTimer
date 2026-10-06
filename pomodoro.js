@@ -1,76 +1,88 @@
 let isLongTimer = true;
 let isPomodoroRunning = false;
 let timer = null;
-let totalTime = null;
 let storedTime = 0;
+let endTime = null; 
 
 const alarme = new Audio('./assets/Alarm.mp3');
-alarme.volume =  0.33;
+alarme.volume = 0.33;
+
+function updateDisplay(seconds) {
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  const formatted = `${min}:${String(sec).padStart(2, "0")}`;
+  
+  document.getElementById("timer").textContent = formatted;
+  document.getElementById("title").textContent = formatted;
+}
 
 function timerSwitch() {
   if (!isPomodoroRunning) {
     isLongTimer = !isLongTimer;
     storedTime = 0;
     setTimer();
-    console.log("Mudou", isLongTimer);
   }
 }
 
 function setTimer() {
-    if (storedTime > 0) {
-        document.getElementById("start-stop").textContent = "Resume";
-        document.getElementById("title").textContent = `Pomodoro Timer`;
-    } 
-    else {
-        document.getElementById("start-stop").textContent = "Start";
-        document.getElementById("timer").textContent = isLongTimer ? "25:00" : "5:00";
-        document.getElementById("title").textContent = `Pomodoro Timer`;
-    }
+  if (storedTime > 0) {
+    document.getElementById("start-stop").textContent = "Resume";
+    document.getElementById("title").textContent = "Pomodoro Timer";
+    updateDisplay(storedTime);
+  } else {
+    document.getElementById("start-stop").textContent = "Start";
+    const initialSeconds = isLongTimer ? 25 * 60 : 5 * 60;
+    updateDisplay(initialSeconds);
+    document.getElementById("title").textContent = "Pomodoro Timer";
+  }
 }
 
 function stopTimer() {
+  if (isPomodoroRunning) {
+    clearInterval(timer);
+    isPomodoroRunning = false;
+    storedTime = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+  }
   setTimer();
-  isPomodoroRunning = false;
-  clearInterval(timer);
 }
 
 function pomodoroTimer() {
   if (!isPomodoroRunning) {
-    setTimer();
-    document.getElementById("start-stop").textContent = "Pause";
     isPomodoroRunning = true;
-    totalTime = (storedTime > 0) ? storedTime
-                  : (isLongTimer) ? 60 * 25 : 60 * 5;
+    document.getElementById("start-stop").textContent = "Pause";
+
+    const durationSeconds = storedTime > 0 
+      ? storedTime 
+      : (isLongTimer ? 25 * 60 : 5 * 60);
+
+    endTime = Date.now() + durationSeconds * 1000;
+
     timer = setInterval(() => {
-      totalTime--;
-      const min = parseInt(totalTime / 60);
-      const sec = parseInt(totalTime % 60);
-      const secFormatado = String(sec).padStart(2, "0");
-      document.getElementById("timer").textContent = `${min}:${secFormatado}`;
-      document.getElementById("title").textContent = `${min}:${secFormatado}`;
-      console.log(`${min}:${sec}`);
-      storedTime = totalTime;
-      if (totalTime == 0) {
-        stopTimer();
-        timerSwitch();
+      const remainingMs = endTime - Date.now();
+      const remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
+
+      storedTime = remainingSec;
+      updateDisplay(remainingSec);
+
+      if (remainingSec <= 0) {
+        clearInterval(timer);
+        isPomodoroRunning = false;
+        storedTime = 0;
+        
         alarme.play();
-        document.getElementById("title").textContent = `Pomodoro Timer`;
+        document.getElementById("title").textContent = "Pomodoro Timer";
+        timerSwitch();
       }
-    }, 1000);
+    }, 250);
   } else {
     stopTimer();
   }
 }
 
-function skip(){
-    if (storedTime > 0) {
-        stopTimer();
-        totalTime = 0;
-        storedTime = 0;
-        timerSwitch();
-        console.log("Total Time: ", totalTime);
-        console.log("Stored Time: ", storedTime);
-    }
+function skip() {
+  if (storedTime > 0 || isPomodoroRunning) {
+    stopTimer();
+    storedTime = 0;
+    timerSwitch();
+  }
 }
-
-
